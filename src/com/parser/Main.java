@@ -1,24 +1,12 @@
 package com.parser;
 
 public class Main {
+    private Parser[] parsers;
+    private Thread[] threads;
 
     public static void main(String[] args) {
-        Parser parser = new Parser();
-        Thread thread = new Thread(parser);
-        thread.setDaemon(true);
+        Core core = new Core();
 
-        thread.start();
-
-        System.out.println("Core message");
-
-        if (thread.isAlive()) {
-            try {
-                thread.join();
-            } catch (InterruptedException $exception) {
-                System.out.println("exception");
-            }
-        }
-
-        System.out.println(parser.result);
+        core.execute();
     }
 }

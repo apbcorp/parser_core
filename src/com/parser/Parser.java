@@ -9,13 +9,20 @@ import java.net.URL;
 import org.json.JSONObject;
 
 public class Parser implements Runnable {
-    public String result = "";
+    private String domain;
+    private int procId;
+    private String result = "";
+    private String task = "";
 
     @Override
     public void run() {
-        System.out.println("Thread started");
+        if (this.isEmptyTask()) {
+            return;
+        }
+
+        System.out.println("Thread started #" + this.procId);
         try {
-            URL url = new URL("http://project-admin.local/en/api/json-rpc");
+            URL url = new URL(this.domain + this.task);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
 
@@ -27,7 +34,6 @@ public class Parser implements Runnable {
             wr.close();
 
             int status = connection.getResponseCode();
-            System.out.println("Status: " + status);
             BufferedReader responseBuffer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             String line;
@@ -44,5 +50,43 @@ public class Parser implements Runnable {
         } catch (IOException exception) {
             this.result = exception.getMessage();
         }
+
+        this.task = "";
+    }
+
+    public boolean isEmpty() {
+        return this.result.equals("") && this.task.equals("");
+    }
+
+    public boolean isEmptyTask() {
+        return this.task.equals("");
+    }
+
+    public Parser setDomain(String domain) {
+        this.domain = domain;
+
+        return this;
+    }
+
+    public Parser setProcId(int procId) {
+        this.procId = procId;
+
+        return this;
+    }
+
+    public int getProcId()
+    {
+        return this.procId;
+    }
+
+    public String getResult() {
+        String result = this.result;
+        this.result = "";
+
+        return result;
+    }
+
+    public void setTask(String task) {
+        this.task = task;
     }
 }
